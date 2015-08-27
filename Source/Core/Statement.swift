@@ -111,6 +111,8 @@ public final class Statement {
 
     /// - Parameter bindings: A list of parameters to bind to the statement.
     ///
+    /// - Throws: `Result.Error` if query execution fails.
+    ///
     /// - Returns: The statement object (useful for chaining).
     public func run(bindings: Binding?...) throws -> Statement {
         guard bindings.isEmpty else {
@@ -124,6 +126,8 @@ public final class Statement {
 
     /// - Parameter bindings: A list of parameters to bind to the statement.
     ///
+    /// - Throws: `Result.Error` if query execution fails.
+    ///
     /// - Returns: The statement object (useful for chaining).
     public func run(bindings: [Binding?]) throws -> Statement {
         return try bind(bindings).run()
@@ -131,6 +135,8 @@ public final class Statement {
 
     /// - Parameter bindings: A dictionary of named parameters to bind to the
     ///   statement.
+    ///
+    /// - Throws: `Result.Error` if query execution fails.
     ///
     /// - Returns: The statement object (useful for chaining).
     public func run(bindings: [String: Binding?]) throws -> Statement {

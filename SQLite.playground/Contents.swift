@@ -16,7 +16,12 @@ try! db.run(users.create { t in
     t.column(name)
 })
 
-try! db.run(users.insert(email <- "alice@mac.com"))
+let rowid = try! db.run(users.insert(email <- "alice@mac.com"))
+let alice = users.filter(id == rowid)
+
+for user in db.prepare(users) {
+    print("id: \(user[id]), email: \(user[email])")
+}
 
 let emails = VirtualTable("emails")
 
@@ -30,9 +35,9 @@ try! db.run(emails.insert(
     body <- "This is a hello world message."
 ))
 
-let row = try! db.pluck(emails.match("hello"))
+let row = db.pluck(emails.match("hello"))
 
-let query = try! db.prepare(emails.match("hello"))
+let query = db.prepare(emails.match("hello"))
 for row in query {
     print(row[subject])
 }

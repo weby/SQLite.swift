@@ -259,7 +259,7 @@ class QueryIntegrationTests : SQLiteTestCase {
     }
 
     func test_scalar() {
-        let count = try! db.scalar(users.count)
+        let count = db.scalar(users.count)
         XCTAssertEqual(0, count)
     }
 

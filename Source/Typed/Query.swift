@@ -851,7 +851,7 @@ extension Connection {
             column: for each in query.clauses.select.columns ?? [Expression<Void>(literal: "*")] {
                 var names = each.expression.template.characters.split { $0 == "." }.map(String.init)
                 let column = names.removeLast()
-                let namespace = ".".join(names)
+                let namespace = names.joinWithSeparator(".")
 
                 func expandGlob(namespace: Bool) -> QueryType -> Void {
                     return { query in
@@ -918,8 +918,9 @@ extension Connection {
     ///
     /// - Returns: The insert’s rowid.
     public func run(query: Insert) throws -> Int64 {
+        let expression = query.expression
         return try sync {
-            try self.run(query.expression.template, query.expression.bindings)
+            try self.run(expression.template, expression.bindings)
             return self.lastInsertRowid!
         }
     }
@@ -933,8 +934,9 @@ extension Connection {
     ///
     /// - Returns: The number of updated rows.
     public func run(query: Update) throws -> Int {
+        let expression = query.expression
         return try sync {
-            try self.run(query.expression.template, query.expression.bindings)
+            try self.run(expression.template, expression.bindings)
             return self.changes
         }
     }
@@ -947,8 +949,9 @@ extension Connection {
     ///
     /// - Returns: The number of deleted rows.
     public func run(query: Delete) throws -> Int {
+        let expression = query.expression
         return try sync {
-            try self.run(query.expression.template, query.expression.bindings)
+            try self.run(expression.template, expression.bindings)
             return self.changes
         }
     }
