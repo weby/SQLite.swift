@@ -42,8 +42,8 @@ extension Optional : _OptionalType {
 
 }
 
-// let SQLITE_STATIC = unsafeBitCast(0, sqlite3_destructor_type.self)
-let SQLITE_TRANSIENT = unsafeBitCast(-1, sqlite3_destructor_type.self)
+// let SQLITE_STATIC = unsafeBitCast(0, to: sqlite3_destructor_type.self)
+let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
 extension String {
 
@@ -59,9 +59,9 @@ extension String {
         for expressible in expressions {
             let expression = expressible.expression
             template.append(expression.template)
-            bindings.appendContentsOf(expression.bindings)
+			bindings.append(contentsOf: expression.bindings)
         }
-        return Expression<Void>(template.joinWithSeparator(self), bindings)
+		return Expression<Void>(template.joined(separator: self), bindings)
     }
 
     @warn_unused_result func infix<T>(_ lhs: Expressible, _ rhs: Expressible, wrap: Bool = true) -> Expression<T> {

@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 
+import Foundation
 import Dispatch
 import CSQLite
 
@@ -316,7 +317,7 @@ public final class Connection {
     ///     The block must throw to roll the savepoint back.
     ///
     /// - Throws: `SQLite.Result.Error`, and rethrows.
-    public func savepoint(_ name: String = NSUUID().UUIDString, block: () throws -> Void) throws {
+    public func savepoint(_ name: String = NSUUID().uuidString, block: () throws -> Void) throws {
         let name = name.quote("'")
         let savepoint = "SAVEPOINT \(name)"
 
@@ -387,7 +388,7 @@ public final class Connection {
             return
         }
 
-        let box: Trace = { callback(String.fromCString($0)!) }
+		let box: Trace = { callback(String(cString: $0)) }
         sqlite3_trace(handle, { callback, SQL in
             unsafeBitCast(callback, Trace.self)(SQL)
         }, unsafeBitCast(box, UnsafeMutablePointer<Void>.self))
@@ -412,8 +413,8 @@ public final class Connection {
         let box: UpdateHook = {
             callback(
                 operation: Operation(rawValue: $0),
-                db: String.fromCString($1)!,
-                table: String.fromCString($2)!,
+                db: String(cString: $1),
+                table: String(cString: $2),
                 rowid: $3
             )
         }
@@ -553,7 +554,7 @@ public final class Connection {
     ///     comparison result.
     public func createCollation(_ collation: String, _ block: (lhs: String, rhs: String) -> ComparisonResult) {
         let box: Collation = { lhs, rhs in
-            Int32(block(lhs: String.fromCString(UnsafePointer<Int8>(lhs))!, rhs: String.fromCString(UnsafePointer<Int8>(rhs))!).rawValue)
+			Int32(block(lhs: String(cString: UnsafePointer<Int8>(lhs)), rhs: String(cString: UnsafePointer<Int8>(rhs))).rawValue)
         }
         try! check(sqlite3_create_collation_v2(handle, collation, SQLITE_UTF8, unsafeBitCast(box, UnsafeMutablePointer<Void>.self), { callback, _, lhs, _, rhs in
             unsafeBitCast(callback, Collation.self)(lhs, rhs)
@@ -567,7 +568,7 @@ public final class Connection {
 
     func sync<T>(_ block: () throws -> T) rethrows -> T {
         var success: T?
-        var failure: ErrorType?
+        var failure: ErrorProtocol?
 
         let box: () -> Void = {
             do {
@@ -600,9 +601,9 @@ public final class Connection {
 
     private var queue = dispatch_queue_create("SQLite.Database", DISPATCH_QUEUE_SERIAL)
 
-    private static let queueKey = unsafeBitCast(Connection.self, UnsafePointer<Void>.self)
+    private static let queueKey = unsafeBitCast(Connection.self, to: UnsafePointer<Void>.self)
 
-    private lazy var queueContext: UnsafeMutablePointer<Void> = unsafeBitCast(self, UnsafeMutablePointer<Void>.self)
+    private lazy var queueContext: UnsafeMutablePointer<Void> = unsafeBitCast(self, to: UnsafeMutablePointer<Void>.self)
 
 }
 
@@ -656,7 +657,7 @@ public enum Operation {
 
 }
 
-public enum Result : ErrorType {
+public enum Result : ErrorProtocol {
 
     private static let successCodes: Set = [SQLITE_OK, SQLITE_ROW, SQLITE_DONE]
 

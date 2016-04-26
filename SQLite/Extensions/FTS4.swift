@@ -103,12 +103,12 @@ public struct Tokenizer {
         }
 
         if !tokenchars.isEmpty {
-            let joined = tokenchars.map { String($0) }.joinWithSeparator("")
+			let joined = tokenchars.map { String($0) }.joined(separator: "")
             arguments.append("tokenchars=\(joined)".quote())
         }
 
         if !separators.isEmpty {
-            let joined = separators.map { String($0) }.joinWithSeparator("")
+			let joined = separators.map { String($0) }.joined(separator: "")
             arguments.append("separators=\(joined)".quote())
         }
 
@@ -135,7 +135,7 @@ public struct Tokenizer {
 extension Tokenizer : CustomStringConvertible {
 
     public var description: String {
-        return ([name] + arguments).joinWithSeparator(" ")
+		return ([name] + arguments).joined(separator: " ")
     }
 
 }

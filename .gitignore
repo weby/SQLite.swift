@@ -25,4 +25,5 @@ Carthage
 # Swift Package Manager
 .build/
 Packages/
+SQLite.swift.xcodeproj/
 

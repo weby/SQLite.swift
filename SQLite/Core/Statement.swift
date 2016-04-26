@@ -185,7 +185,7 @@ public final class Statement {
 
 }
 
-extension Statement : SequenceType {
+extension Statement : Sequence {
 
     public func generate() -> Statement {
         reset(clearBindings: false)
@@ -194,7 +194,7 @@ extension Statement : SequenceType {
 
 }
 
-extension Statement : GeneratorType {
+extension Statement : IteratorProtocol {
 
     public func next() -> [Binding?]? {
         return try! step() ? Array(row) : nil
@@ -252,7 +252,7 @@ public struct Cursor {
 }
 
 /// Cursors provide direct access to a statement’s current row.
-extension Cursor : SequenceType {
+extension Cursor : Sequence {
 
     public subscript(idx: Int) -> Binding? {
         switch sqlite3_column_type(handle, Int32(idx)) {
@@ -271,11 +271,11 @@ extension Cursor : SequenceType {
         }
     }
 
-    public func generate() -> AnyGenerator<Binding?> {
+    public func makeIterator() -> AnyIterator<Binding?> {
         var idx = 0
-        return AnyGenerator {
+        return AnyIterator {
             if idx >= self.columnCount {
-                return Optional<Binding?>.None
+                return Optional<Binding?>.none
             } else {
                 idx += 1
                 return self[idx - 1]

@@ -47,11 +47,11 @@ extension NSDate : Value {
     }
 
     public class func fromDatatypeValue(_ stringValue: String) -> NSDate {
-        return dateFormatter.dateFromString(stringValue)!
+		return dateFormatter.date(from: stringValue)!
     }
 
     public var datatypeValue: String {
-        return dateFormatter.stringFromDate(self)
+		return dateFormatter.string(from: self)
     }
 
 }
