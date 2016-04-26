@@ -32,22 +32,22 @@ class SQLiteTestCase : XCTestCase {
         )
     }
 
-    func InsertUsers(names: String...) throws {
+    func InsertUsers(_ names: String...) throws {
         try InsertUsers(names)
     }
 
-    func InsertUsers(names: [String]) throws {
+    func InsertUsers(_ names: [String]) throws {
         for name in names { try InsertUser(name) }
     }
 
-    func InsertUser(name: String, age: Int? = nil, admin: Bool = false) throws -> Statement {
+    func InsertUser(_ name: String, age: Int? = nil, admin: Bool = false) throws -> Statement {
         return try db.run(
             "INSERT INTO \"users\" (email, age, admin) values (?, ?, ?)",
             "\(name)@example.com", age?.datatypeValue, admin.datatypeValue
         )
     }
 
-    func AssertSQL(SQL: String, _ executions: Int = 1, _ message: String? = nil, file: StaticString = #file, line: UInt = #line) {
+    func AssertSQL(_ SQL: String, _ executions: Int = 1, _ message: String? = nil, file: StaticString = #file, line: UInt = #line) {
         XCTAssertEqual(
             executions, trace[SQL] ?? 0,
             message ?? SQL,
@@ -55,13 +55,13 @@ class SQLiteTestCase : XCTestCase {
         )
     }
 
-    func AssertSQL(SQL: String, _ statement: Statement, _ message: String? = nil, file: StaticString = #file, line: UInt = #line) {
+    func AssertSQL(_ SQL: String, _ statement: Statement, _ message: String? = nil, file: StaticString = #file, line: UInt = #line) {
         try! statement.run()
         AssertSQL(SQL, 1, message, file: file, line: line)
         if let count = trace[SQL] { trace[SQL] = count - 1 }
     }
 
-//    func AssertSQL(SQL: String, _ query: Query, _ message: String? = nil, file: String = __FILE__, line: UInt = __LINE__) {
+//    func AssertSQL(_ SQL: String, _ query: Query, _ message: String? = nil, file: String = __FILE__, line: UInt = __LINE__) {
 //        for _ in query {}
 //        AssertSQL(SQL, 1, message, file: file, line: line)
 //        if let count = trace[SQL] { trace[SQL] = count - 1 }
@@ -96,11 +96,11 @@ let int64Optional = Expression<Int64?>("int64Optional")
 let string = Expression<String>("string")
 let stringOptional = Expression<String?>("stringOptional")
 
-func AssertSQL(@autoclosure expression1: () -> String, @autoclosure _ expression2: () -> Expressible, file: StaticString = #file, line: UInt = #line) {
+func AssertSQL(@autoclosure _ expression1: () -> String, @autoclosure _ expression2: () -> Expressible, file: StaticString = #file, line: UInt = #line) {
     XCTAssertEqual(expression1(), expression2().asSQL(), file: file, line: line)
 }
 
-func AssertThrows<T>(@autoclosure expression: () throws -> T, file: StaticString = #file, line: UInt = #line) {
+func AssertThrows<T>(@autoclosure _ expression: () throws -> T, file: StaticString = #file, line: UInt = #line) {
     do {
         try expression()
         XCTFail("expression expected to throw", file: file, line: line)

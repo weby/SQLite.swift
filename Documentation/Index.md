@@ -1082,7 +1082,7 @@ SQLite.swift supports serializing and deserializing any custom type as long as i
 > protocol Value {
 >     typealias Datatype: Binding
 >     class var declaredDatatype: String { get }
->     class func fromDatatypeValue(datatypeValue: Datatype) -> Self
+>     class func fromDatatypeValue(_ datatypeValue: Datatype) -> Self
 >     var datatypeValue: Datatype { get }
 > }
 > ```
@@ -1105,7 +1105,7 @@ extension NSDate: Value {
     class var declaredDatatype: String {
         return String.declaredDatatype
     }
-    class func fromDatatypeValue(stringValue: String) -> NSDate {
+    class func fromDatatypeValue(_ stringValue: String) -> NSDate {
         return SQLDateFormatter.dateFromString(stringValue)!
     }
     var datatypeValue: String {
@@ -1129,7 +1129,7 @@ extension NSDate: Value {
     class var declaredDatatype: String {
         return Int.declaredDatatype
     }
-    class func fromDatatypeValue(intValue: Int) -> Self {
+    class func fromDatatypeValue(_ intValue: Int) -> Self {
         return self(timeIntervalSince1970: NSTimeInterval(intValue))
     }
     var datatypeValue: Int {
@@ -1164,7 +1164,7 @@ extension NSData: Value {
     class var declaredDatatype: String {
         return Blob.declaredDatatype
     }
-    class func fromDatatypeValue(blobValue: Blob) -> Self {
+    class func fromDatatypeValue(_ blobValue: Blob) -> Self {
         return self(bytes: blobValue.bytes, length: blobValue.length)
     }
     var datatypeValue: Blob {
@@ -1181,7 +1181,7 @@ extension UIImage: Value {
     public class var declaredDatatype: String {
         return Blob.declaredDatatype
     }
-    public class func fromDatatypeValue(blobValue: Blob) -> UIImage {
+    public class func fromDatatypeValue(_ blobValue: Blob) -> UIImage {
         return UIImage(data: NSData.fromDatatypeValue(blobValue))!
     }
     public var datatypeValue: Blob {

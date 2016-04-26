@@ -54,7 +54,7 @@ public final class Statement {
     /// - Parameter values: A list of parameters to bind to the statement.
     ///
     /// - Returns: The statement object (useful for chaining).
-    public func bind(values: Binding?...) -> Statement {
+    public func bind(_ values: Binding?...) -> Statement {
         return bind(values)
     }
 
@@ -63,7 +63,7 @@ public final class Statement {
     /// - Parameter values: A list of parameters to bind to the statement.
     ///
     /// - Returns: The statement object (useful for chaining).
-    public func bind(values: [Binding?]) -> Statement {
+    public func bind(_ values: [Binding?]) -> Statement {
         if values.isEmpty { return self }
         reset()
         guard values.count == Int(sqlite3_bind_parameter_count(handle)) else {
@@ -79,7 +79,7 @@ public final class Statement {
     ///   statement.
     ///
     /// - Returns: The statement object (useful for chaining).
-    public func bind(values: [String: Binding?]) -> Statement {
+    public func bind(_ values: [String: Binding?]) -> Statement {
         reset()
         for (name, value) in values {
             let idx = sqlite3_bind_parameter_index(handle, name)
@@ -91,7 +91,7 @@ public final class Statement {
         return self
     }
 
-    private func bind(value: Binding?, atIndex idx: Int) {
+    private func bind(_ value: Binding?, atIndex idx: Int) {
         if value == nil {
             sqlite3_bind_null(handle, Int32(idx))
         } else if let value = value as? Blob {
@@ -116,7 +116,7 @@ public final class Statement {
     /// - Throws: `Result.Error` if query execution fails.
     ///
     /// - Returns: The statement object (useful for chaining).
-    public func run(bindings: Binding?...) throws -> Statement {
+    public func run(_ bindings: Binding?...) throws -> Statement {
         guard bindings.isEmpty else {
             return try run(bindings)
         }
@@ -131,7 +131,7 @@ public final class Statement {
     /// - Throws: `Result.Error` if query execution fails.
     ///
     /// - Returns: The statement object (useful for chaining).
-    public func run(bindings: [Binding?]) throws -> Statement {
+    public func run(_ bindings: [Binding?]) throws -> Statement {
         return try bind(bindings).run()
     }
 
@@ -141,14 +141,14 @@ public final class Statement {
     /// - Throws: `Result.Error` if query execution fails.
     ///
     /// - Returns: The statement object (useful for chaining).
-    public func run(bindings: [String: Binding?]) throws -> Statement {
+    public func run(_ bindings: [String: Binding?]) throws -> Statement {
         return try bind(bindings).run()
     }
 
     /// - Parameter bindings: A list of parameters to bind to the statement.
     ///
     /// - Returns: The first value of the first row returned.
-    @warn_unused_result public func scalar(bindings: Binding?...) -> Binding? {
+    @warn_unused_result public func scalar(_ bindings: Binding?...) -> Binding? {
         guard bindings.isEmpty else {
             return scalar(bindings)
         }
@@ -161,7 +161,7 @@ public final class Statement {
     /// - Parameter bindings: A list of parameters to bind to the statement.
     ///
     /// - Returns: The first value of the first row returned.
-    @warn_unused_result public func scalar(bindings: [Binding?]) -> Binding? {
+    @warn_unused_result public func scalar(_ bindings: [Binding?]) -> Binding? {
         return bind(bindings).scalar()
     }
 
@@ -170,7 +170,7 @@ public final class Statement {
     ///   statement.
     ///
     /// - Returns: The first value of the first row returned.
-    @warn_unused_result public func scalar(bindings: [String: Binding?]) -> Binding? {
+    @warn_unused_result public func scalar(_ bindings: [String: Binding?]) -> Binding? {
         return bind(bindings).scalar()
     }
 

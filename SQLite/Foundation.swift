@@ -30,7 +30,7 @@ extension NSData : Value {
         return Blob.declaredDatatype
     }
 
-    public class func fromDatatypeValue(dataValue: Blob) -> NSData {
+    public class func fromDatatypeValue(_ dataValue: Blob) -> NSData {
         return NSData(bytes: dataValue.bytes, length: dataValue.bytes.count)
     }
 
@@ -46,7 +46,7 @@ extension NSDate : Value {
         return String.declaredDatatype
     }
 
-    public class func fromDatatypeValue(stringValue: String) -> NSDate {
+    public class func fromDatatypeValue(_ stringValue: String) -> NSDate {
         return dateFormatter.dateFromString(stringValue)!
     }
 
