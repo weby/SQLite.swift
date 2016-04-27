@@ -27,7 +27,7 @@ import CSQLite
 /// A single SQL statement.
 public final class Statement {
 
-    private var handle: COpaquePointer = nil
+    private var handle: OpaquePointer? = nil
 
     private let connection: Connection
 
@@ -43,7 +43,7 @@ public final class Statement {
     public lazy var columnCount: Int = Int(sqlite3_column_count(self.handle))
 
     public lazy var columnNames: [String] = (0..<Int32(self.columnCount)).map {
-        String.fromCString(sqlite3_column_name(self.handle, $0))!
+		String(cString: sqlite3_column_name(self.handle, $0))
     }
 
     /// A cursor pointing to the current row.
@@ -205,14 +205,14 @@ extension Statement : IteratorProtocol {
 extension Statement : CustomStringConvertible {
 
     public var description: String {
-        return String.fromCString(sqlite3_sql(handle))!
+		return String(cString: sqlite3_sql(handle))
     }
 
 }
 
 public struct Cursor {
 
-    private let handle: COpaquePointer
+    private let handle: OpaquePointer?
 
     private let columnCount: Int
 
@@ -230,7 +230,7 @@ public struct Cursor {
     }
 
     public subscript(idx: Int) -> String {
-        return String.fromCString(UnsafePointer(sqlite3_column_text(handle, Int32(idx)))) ?? ""
+		return String(cString: UnsafePointer(sqlite3_column_text(handle, Int32(idx)))) ?? ""
     }
 
     public subscript(idx: Int) -> Blob {

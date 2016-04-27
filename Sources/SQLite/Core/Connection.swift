@@ -50,9 +50,9 @@ public final class Connection {
         case URI(String)
     }
 
-    public var handle: COpaquePointer { return _handle }
+    public var handle: OpaquePointer? { return _handle }
 
-    private var _handle: COpaquePointer = nil
+    private var _handle: OpaquePointer? = nil
 
     /// Initializes a new SQLite connection.
     ///
@@ -367,8 +367,8 @@ public final class Connection {
 
         let box: BusyHandler = { callback(tries: Int($0)) ? 1 : 0 }
         sqlite3_busy_handler(handle, { callback, tries in
-            unsafeBitCast(callback, BusyHandler.self)(tries)
-        }, unsafeBitCast(box, UnsafeMutablePointer<Void>.self))
+            unsafeBitCast(callback, to: BusyHandler.self)(tries)
+        }, unsafeBitCast(box, to: UnsafeMutablePointer<Void>.self))
         busyHandler = box
     }
     private typealias BusyHandler = @convention(block) Int32 -> Int32
@@ -390,8 +390,8 @@ public final class Connection {
 
 		let box: Trace = { callback(String(cString: $0)) }
         sqlite3_trace(handle, { callback, SQL in
-            unsafeBitCast(callback, Trace.self)(SQL)
-        }, unsafeBitCast(box, UnsafeMutablePointer<Void>.self))
+            unsafeBitCast(callback, to: Trace.self)(SQL)
+        }, unsafeBitCast(box, to: UnsafeMutablePointer<Void>.self))
         trace = box
     }
     private typealias Trace = @convention(block) UnsafePointer<Int8> -> Void
@@ -419,8 +419,8 @@ public final class Connection {
             )
         }
         sqlite3_update_hook(handle, { callback, operation, db, table, rowid in
-            unsafeBitCast(callback, UpdateHook.self)(operation, db, table, rowid)
-        }, unsafeBitCast(box, UnsafeMutablePointer<Void>.self))
+            unsafeBitCast(callback, to: UpdateHook.self)(operation, db, table, rowid)
+        }, unsafeBitCast(box, to: UnsafeMutablePointer<Void>.self))
         updateHook = box
     }
     private typealias UpdateHook = @convention(block) (Int32, UnsafePointer<Int8>, UnsafePointer<Int8>, Int64) -> Void
@@ -447,8 +447,8 @@ public final class Connection {
             return 0
         }
         sqlite3_commit_hook(handle, { callback in
-            unsafeBitCast(callback, CommitHook.self)()
-        }, unsafeBitCast(box, UnsafeMutablePointer<Void>.self))
+            unsafeBitCast(callback, to: CommitHook.self)()
+        }, unsafeBitCast(box, to: UnsafeMutablePointer<Void>.self))
         commitHook = box
     }
     private typealias CommitHook = @convention(block) () -> Int32
@@ -467,8 +467,8 @@ public final class Connection {
 
         let box: RollbackHook = { callback() }
         sqlite3_rollback_hook(handle, { callback in
-            unsafeBitCast(callback, RollbackHook.self)()
-        }, unsafeBitCast(box, UnsafeMutablePointer<Void>.self))
+            unsafeBitCast(callback, to: RollbackHook.self)()
+        }, unsafeBitCast(box, to: UnsafeMutablePointer<Void>.self))
         rollbackHook = box
     }
     private typealias RollbackHook = @convention(block) () -> Void
@@ -508,7 +508,7 @@ public final class Connection {
                 case SQLITE_NULL:
                     return nil
                 case SQLITE_TEXT:
-                    return String.fromCString(UnsafePointer(sqlite3_value_text(value)))!
+					return String(cString: UnsafePointer(sqlite3_value_text(value)))
                 case let type:
                     fatalError("unsupported value type: \(type)")
                 }
@@ -532,13 +532,13 @@ public final class Connection {
         if deterministic {
             flags |= SQLITE_DETERMINISTIC
         }
-        sqlite3_create_function_v2(handle, function, Int32(argc), flags, unsafeBitCast(box, UnsafeMutablePointer<Void>.self), { context, argc, value in
-            unsafeBitCast(sqlite3_user_data(context), Function.self)(context, argc, value)
+        sqlite3_create_function_v2(handle, function, Int32(argc), flags, unsafeBitCast(box, to: UnsafeMutablePointer<Void>.self), { context, argc, value in
+            unsafeBitCast(sqlite3_user_data(context), to: Function.self)(context, argc, value)
         }, nil, nil, nil)
         if functions[function] == nil { self.functions[function] = [:] }
         functions[function]?[argc] = box
     }
-    private typealias Function = @convention(block) (COpaquePointer, Int32, UnsafeMutablePointer<COpaquePointer>) -> Void
+    private typealias Function = @convention(block) (OpaquePointer!, Int32, UnsafeMutablePointer<OpaquePointer?>) -> Void
     private var functions = [String: [Int: Function]]()
 
     /// The return type of a collation comparison function.
@@ -556,8 +556,8 @@ public final class Connection {
         let box: Collation = { lhs, rhs in
 			Int32(block(lhs: String(cString: UnsafePointer<Int8>(lhs)), rhs: String(cString: UnsafePointer<Int8>(rhs))).rawValue)
         }
-        try! check(sqlite3_create_collation_v2(handle, collation, SQLITE_UTF8, unsafeBitCast(box, UnsafeMutablePointer<Void>.self), { callback, _, lhs, _, rhs in
-            unsafeBitCast(callback, Collation.self)(lhs, rhs)
+        try! check(sqlite3_create_collation_v2(handle, collation, SQLITE_UTF8, unsafeBitCast(box, to: UnsafeMutablePointer<Void>.self), { callback, _, lhs, _, rhs in
+            unsafeBitCast(callback, to: Collation.self)(lhs, rhs)
         }, nil))
         collations[collation] = box
     }
@@ -610,7 +610,7 @@ public final class Connection {
 extension Connection : CustomStringConvertible {
 
     public var description: String {
-        return String.fromCString(sqlite3_db_filename(handle, nil))!
+		return String(cString: sqlite3_db_filename(handle, nil))
     }
 
 }
@@ -666,7 +666,7 @@ public enum Result : ErrorProtocol {
     init?(errorCode: Int32, connection: Connection, statement: Statement? = nil) {
         guard !Result.successCodes.contains(errorCode) else { return nil }
 
-        let message = String.fromCString(sqlite3_errmsg(connection.handle))!
+		let message = String(cString: sqlite3_errmsg(connection.handle))
         self = Error(message: message, code: errorCode, statement: statement)
     }
 

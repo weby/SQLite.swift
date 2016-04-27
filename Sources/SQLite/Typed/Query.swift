@@ -889,7 +889,7 @@ extension Connection {
             column: for each in query.clauses.select.columns ?? [Expression<Void>(literal: "*")] {
                 var names = each.expression.template.characters.split { $0 == "." }.map(String.init)
                 let column = names.removeLast()
-                let namespace = names.joinWithSeparator(".")
+				let namespace = names.joined(separator: ".")
 
                 func expandGlob(_ namespace: Bool) -> (QueryType throws -> Void) {
                     return { (query: QueryType) throws -> (Void) in
@@ -928,7 +928,7 @@ extension Connection {
         }()
 
         return AnySequence {
-            AnyGenerator { statement.next().map { Row(columnNames, $0) } }
+            AnyIterator { statement.next().map { Row(columnNames, $0) } }
         }
     }
 
@@ -955,7 +955,7 @@ extension Connection {
     }
 
     public func pluck(_ query: QueryType) -> Row? {
-        return try! prepare(query.limit(1, query.clauses.limit?.offset)).generate().next()
+        return try! prepare(query.limit(1, query.clauses.limit?.offset)).makeIterator().next()
     }
 
     /// Runs an `Insert` query.
@@ -1039,7 +1039,7 @@ public struct Row {
 
             switch similar.count {
             case 0:
-                fatalError("no such column '\(column.template)' in columns: \(columnNames.keys.sort())")
+                fatalError("no such column '\(column.template)' in columns: \(columnNames.keys.sorted())")
             case 1:
                 return valueAtIndex(columnNames[similar[0]]!)
             default:
