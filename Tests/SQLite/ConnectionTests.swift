@@ -288,14 +288,14 @@ class ConnectionTests : SQLiteTestCase {
 
     func test_createCollation_createsCollation() {
         db.createCollation("NODIACRITIC") { lhs, rhs in
-            return lhs.compare(rhs, options: .DiacriticInsensitiveSearch)
+            return lhs.compare(rhs, options: .diacriticInsensitiveSearch)
         }
         XCTAssertEqual(1, db.scalar("SELECT ? = ? COLLATE NODIACRITIC", "cafe", "café") as? Int64)
     }
 
     func test_createCollation_createsQuotableCollation() {
         db.createCollation("NO DIACRITIC") { lhs, rhs in
-            return lhs.compare(rhs, options: .DiacriticInsensitiveSearch)
+            return lhs.compare(rhs, options: .diacriticInsensitiveSearch)
         }
         XCTAssertEqual(1, db.scalar("SELECT ? = ? COLLATE \"NO DIACRITIC\"", "cafe", "café") as? Int64)
     }

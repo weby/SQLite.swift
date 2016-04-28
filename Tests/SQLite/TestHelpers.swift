@@ -68,9 +68,9 @@ class SQLiteTestCase : XCTestCase {
 //    }
 
     func async(expect description: String = "async", timeout: Double = 5, @noescape block: (() -> Void) -> Void) {
-        let expectation = expectationWithDescription(description)
-        block(expectation.fulfill)
-        waitForExpectationsWithTimeout(timeout, handler: nil)
+        let testExpectation = expectation(withDescription: description)
+        block(testExpectation.fulfill)
+		waitForExpectations(withTimeout: timeout, handler: nil)
     }
 
 }
