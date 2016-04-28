@@ -2,6 +2,58 @@
 
 [![Build Status][Badge]][Travis] [![CocoaPods Version](https://cocoapod-badges.herokuapp.com/v/SQLite.swift/badge.png)](http://cocoadocs.org/docsets/SQLite.swift) [![Platform](https://cocoapod-badges.herokuapp.com/p/SQLite.swift/badge.png)](http://cocoadocs.org/docsets/SQLite.swift) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![Join the chat at https://gitter.im/stephencelis/SQLite.swift](https://badges.gitter.im/stephencelis/SQLite.swift.svg)](https://gitter.im/stephencelis/SQLite.swift)
 
+
+This fork is a port of SQLite.swift to Swift 3.0 2016-04-12-a + Swift Package Manager (SPM).
+
+FTS4 module does not compile because of .m files which SPM doesn't support yet and is commented out.
+
+Tests work on OS X, but don't work on Linux because 'swift test' doesn't accept -X flag.
+
+## How to build on Linux:
+
+Install Swift 3.0 2016-04-12-a, for example by using [swiftenv](https://github.com/kylef/swiftenv).
+
+Build libdispatch:
+```
+git clone -b experimental/foundation https://github.com/apple/swift-corelibs-libdispatch.git
+cd swift-corelibs-libdispatch
+git submodule init
+git submodule update
+sh ./autogen.sh
+./configure --with-swift-toolchain=<path-to-swift>/usr --prefix=<path-to-swift>/usr
+make
+make install
+```
+Replace `<path-to-swift>` with `~/.swiftenv/versions/DEVELOPMENT-SNAPSHOT-2016-04-12-a`
+
+Build the library:
+
+``` bash
+swift build -Xcc -fblocks -Xlinker -ldispatch
+```
+
+## How to build on OS X:
+
+Install Swift 3.0 2016-04-12-a, set it as active toolchain in X-code.
+`swift --version` should show `Apple Swift version 3.0-dev`
+
+Run `swift build` to build the library or `swift test` to run the tests.
+
+To generate Xcode project, run:
+```
+swift build -X
+```
+Open the project and add `Sources/CSQLite` to `Build Settings - Import Paths`.
+
+## How to use the library in other projects
+
+Add the following line to dependencies:
+```
+.Package(url: "https://github.com/zmeyc/SQLite.swift.git", majorVersion: 0)
+```
+
+## Original README:
+
 A type-safe, [Swift][]-language layer over [SQLite3][].
 
 [SQLite.swift][] provides compile-time confidence in SQL statement
