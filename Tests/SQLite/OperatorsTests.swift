@@ -245,10 +245,10 @@ class OperatorsTests : XCTestCase {
         AssertSQL("(1 <= \"boolOptional\")", true <= boolOptional)
     }
 
-    func test_patternMatchingOperator_withComparableInterval_buildsBetweenBooleanExpression() {
-        AssertSQL("\"int\" BETWEEN 0 AND 5", 0...5 ~= int)
-        AssertSQL("\"intOptional\" BETWEEN 0 AND 5", 0...5 ~= intOptional)
-    }
+//    func test_patternMatchingOperator_withComparableInterval_buildsBetweenBooleanExpression() {
+//        AssertSQL("\"int\" BETWEEN 0 AND 5", 0...5 ~= int)
+//        AssertSQL("\"intOptional\" BETWEEN 0 AND 5", 0...5 ~= intOptional)
+//    }
 
     func test_doubleAndOperator_withBooleanExpressions_buildsCompoundExpression() {
         AssertSQL("(\"bool\" AND \"bool\")", bool && bool)
